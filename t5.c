@@ -78,10 +78,15 @@ void desenha_pecas(int p1[5][5], int p2[5][5], int p3[5][5]);
 void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
 {
   tela_inicia_desenho();
-  desenha_principal(m, LARGURA_TELA*0.2, ALTURA_TELA*0.2, LARGURA_TELA*0.6/10);
+  float largura_matriz_principal = LARGURA_TELA*0.8/10; //isso eh igual a 44.8
+  desenha_principal(m, LARGURA_TELA*0.1, ALTURA_TELA*0.05, largura_matriz_principal);
   desenha_pecas(p1, p2, p3);
+  float largura_quadrado_matriz = largura_matriz_principal/10; //isso eh igual a 4.48
   if (tela_rato_apertado()) {
-    tela_circulo(tela_rato_x(), tela_rato_y(), 5, 2, amarelo, transparente);
+    char texto[20];
+    sprintf(texto, "oi %f--%f",largura_quadrado_matriz,largura_quadrado_matriz*10);
+    tela_texto(tela_rato_x(),tela_rato_y(),10,amarelo,texto);
+    tela_circulo(tela_rato_x(), tela_rato_y(), 5, 2, amarelo, transparente);;
   } else {
     tela_circulo(tela_rato_x(), tela_rato_y(), 3, 1, marrom, transparente);
   }
