@@ -66,21 +66,31 @@ int main(void)
   return 0;
 }
 
-int retorna_posicao(float x, float y, float posicao_inicial_quadrado_x[100], float posicao_inicial_quadrado_y[100],
-  float posicao_final_quadrado_x[100], float posicao_final_quadrado_y[100])
+void retorna_posicao(float x, float y, float posicao_inicial_quadrado_x[10][10], float posicao_inicial_quadrado_y[10][10],
+  float posicao_final_quadrado_x[10][10], float posicao_final_quadrado_y[10][10],int *linha,int *coluna)
 {
-  int j; 
-  for (j=0; j < 100; j++) {
-    if (x > posicao_inicial_quadrado_x[j] && x < posicao_final_quadrado_x[j] && y > posicao_inicial_quadrado_y[j] && y < posicao_final_quadrado_y[j]){
-      return j;
+  int i,j;
+  bool parar = false;
+  *linha = -1;
+  *coluna = -1;
+  for (i=0;i<10;i++) {
+    for (j=0; j < 10; j++) {
+      if (x > posicao_inicial_quadrado_x[i][j] && x < posicao_final_quadrado_x[i][j] && y > posicao_inicial_quadrado_y[i][j] && y < posicao_final_quadrado_y[i][j]){
+        *linha = j;
+        *coluna = i;
+        parar = true;
+        break;
+      }
     }
+    if (parar) {
+      break;
+    } 
   }
-  return -1;
 }
 
 
 // funções auxiliares usadas por desenha_tela, definidas abaixo
-void desenha_principal(int m[10][10], float x_ini, float y_ini, float lado,float posicao_inicial_quadrado_x[100],float posicao_inicial_quadrado_y[100],float posicao_final_quadrado_x[100],float posicao_final_quadrado_y[100]);
+void desenha_principal(int m[10][10], float x_ini, float y_ini, float lado,float posicao_inicial_quadrado_x[10][10],float posicao_inicial_quadrado_y[10][10],float posicao_final_quadrado_x[10][10],float posicao_final_quadrado_y[10][10]);
 void desenha_peca(int p[5][5], float x_ini, float y_ini, float lado);
 void desenha_pecas(int p1[5][5], int p2[5][5], int p3[5][5]);
 
@@ -89,8 +99,8 @@ void desenha_pecas(int p1[5][5], int p2[5][5], int p3[5][5]);
 void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
 {
   tela_inicia_desenho();
-  float posicao_inicial_quadrado_x[100],posicao_inicial_quadrado_y[100];
-  float posicao_final_quadrado_x[100],posicao_final_quadrado_y[100];
+  float posicao_inicial_quadrado_x[10][10],posicao_inicial_quadrado_y[10][10];
+  float posicao_final_quadrado_x[10][10],posicao_final_quadrado_y[10][10];
   desenha_principal(m, LARGURA_TELA*0.1, ALTURA_TELA*0.05, LARGURA_TELA*0.8/10,posicao_inicial_quadrado_x, posicao_inicial_quadrado_y,
   posicao_final_quadrado_x, posicao_final_quadrado_y);
   desenha_pecas(p1, p2, p3);
@@ -105,14 +115,16 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
   float x_clicado;
   float y_clicado;
   char texto[100];
-  int posicao_matriz;
   if (tela_rato_clicado()){
     
     x_clicado = tela_rato_x();
     y_clicado = tela_rato_y();
-    posicao_matriz = retorna_posicao(tela_rato_x(), tela_rato_y(), posicao_inicial_quadrado_x, posicao_inicial_quadrado_y,
-    posicao_final_quadrado_x, posicao_final_quadrado_y);
-    sprintf(texto,"%f ------- %f ---- %d",tela_rato_x(),tela_rato_y(),posicao_matriz);
+    int linha_matriz_clicada;
+    int coluna_matriz_clicada;
+    retorna_posicao(tela_rato_x(), tela_rato_y(), posicao_inicial_quadrado_x, posicao_inicial_quadrado_y,
+    posicao_final_quadrado_x, posicao_final_quadrado_y,&linha_matriz_clicada,&coluna_matriz_clicada);
+
+    sprintf(texto,"%f ------- %f ---- %d ----- %d",tela_rato_x(),tela_rato_y(),linha_matriz_clicada,coluna_matriz_clicada);
   }
   tela_texto(x_clicado,y_clicado,10,amarelo,texto);
   tela_termina_desenho();
@@ -123,7 +135,7 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
 // Desenha o tabuleiro principal
 // Ele é formado por uma matrix 10x10, com os valores 0 representando posições
 // livres.
-void desenha_principal(int m[10][10], float x_ini, float y_ini, float lado,float posicao_inicial_quadrado_x[100],float posicao_inicial_quadrado_y[100], float posicao_final_quadrado_x[100],float posicao_final_quadrado_y[100])
+void desenha_principal(int m[10][10], float x_ini, float y_ini, float lado,float posicao_inicial_quadrado_x[10][10],float posicao_inicial_quadrado_y[10][10], float posicao_final_quadrado_x[10][10],float posicao_final_quadrado_y[10][10])
 {
   int cor;
   int i, j, k = 0; 
@@ -136,12 +148,12 @@ void desenha_principal(int m[10][10], float x_ini, float y_ini, float lado,float
       } else {
         cor = azul;
       }
-      posicao_inicial_quadrado_x[k] = x_ini + i*lado;
-      posicao_inicial_quadrado_y[k] = y_ini + j*lado;
-      posicao_final_quadrado_x[k] = x_ini + (i+1)*lado;
-      posicao_final_quadrado_y[k] = y_ini + (j+1)*lado;
-      tela_retangulo(posicao_inicial_quadrado_x[k], posicao_inicial_quadrado_y[k],
-                     posicao_final_quadrado_x[k], posicao_final_quadrado_y[k],
+      posicao_inicial_quadrado_x[i][j] = x_ini + i*lado;
+      posicao_inicial_quadrado_y[i][j] = y_ini + j*lado;
+      posicao_final_quadrado_x[i][j] = x_ini + (i+1)*lado;
+      posicao_final_quadrado_y[i][j] = y_ini + (j+1)*lado;
+      tela_retangulo(posicao_inicial_quadrado_x[i][j], posicao_inicial_quadrado_y[i][j],
+                     posicao_final_quadrado_x[i][j], posicao_final_quadrado_y[i][j],
                      2, branco, cor);
       k++;
     }
