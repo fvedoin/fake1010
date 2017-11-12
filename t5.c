@@ -39,16 +39,25 @@ float x_clicado;
 float y_clicado;
 char texto[100];
 char texto2[100];
-int linha_matriz = -1;
-int coluna_matriz = -1;
-int linha_matriz_clicada = 0;
-int coluna_matriz_clicada = 0;
+int linha_matriz_clicada = -1;
+int coluna_matriz_clicada = -1;
 int peca_clicada = 0;
 bool clicou_em_alguma_peca = false;
 
 // função auxiliar usada por main, definida abaixo
 void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5]);
 bool verifica_jogada(int peca, int linha, int coluna, int m[10][10]);
+
+
+void zerar_matriz(float matriz[5][5])
+{
+  int i,j;
+  for (i=0;i<5;i++) {
+    for (j=0; j < 5; j++) {
+      matriz[i][j] = 0;
+    }
+  }
+}
 
 // A função principal
 int main(void)
@@ -86,6 +95,19 @@ int main(void)
   p2[1][1] = p2[2][1] = p2[3][1] = p2[3][2] = p2[3][3] = 1;
   p3[2][2] = 1;
 
+  zerar_matriz(posicao_inicial_peca1_x);
+  zerar_matriz(posicao_inicial_peca1_y);
+  zerar_matriz(posicao_final_peca1_x);
+  zerar_matriz(posicao_final_peca1_y);
+  zerar_matriz(posicao_inicial_peca2_x);
+  zerar_matriz(posicao_inicial_peca2_y);
+  zerar_matriz(posicao_final_peca2_x);
+  zerar_matriz(posicao_final_peca2_y);
+  zerar_matriz(posicao_inicial_peca3_x);
+  zerar_matriz(posicao_inicial_peca3_y);
+  zerar_matriz(posicao_final_peca3_x);
+  zerar_matriz(posicao_final_peca3_y);
+
   while (true) {
     desenha_tela(m, p1, p2, p3);
   }
@@ -121,7 +143,7 @@ int retorna_numero_peca(float x, float y)
 {
   int i,j;
   for (i=0;i<5;i++) {
-    for (j=0; j < 5; j++) {
+    for (j=0;j<5;j++) {
       if (x > posicao_inicial_peca1_x[i][j] && x < posicao_final_peca1_x[i][j] 
           && y > posicao_inicial_peca1_y[i][j] && y < posicao_final_peca1_y[i][j]
           && posicao_inicial_peca1_y[i][j]!=0){
@@ -142,17 +164,6 @@ int retorna_numero_peca(float x, float y)
   return 0;
 }
 
-void zerar_matriz(float matriz[5][5])
-{
-  int i,j;
-  for (i=0;i<5;i++) {
-    for (j=0; j < 5; j++) {
-      matriz[i][j] = 0;
-    }
-  }
-}
-
-
 // funções auxiliares usadas por desenha_tela, definidas abaixo
 void desenha_principal(int m[10][10], float x_ini, float y_ini, float lado);
 void desenha_peca(int p[5][5], float x_ini, float y_ini, float lado,float posicao_inicial_peca_x[5][5],float posicao_inicial_peca_y[5][5],
@@ -165,24 +176,10 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
 {
   tela_inicia_desenho();
 
-  zerar_matriz(posicao_inicial_peca1_x);
-  zerar_matriz(posicao_inicial_peca1_y);
-  zerar_matriz(posicao_final_peca1_x);
-  zerar_matriz(posicao_final_peca1_y);
-  zerar_matriz(posicao_inicial_peca2_x);
-  zerar_matriz(posicao_inicial_peca2_y);
-  zerar_matriz(posicao_final_peca2_x);
-  zerar_matriz(posicao_final_peca2_y);
-  zerar_matriz(posicao_inicial_peca3_x);
-  zerar_matriz(posicao_inicial_peca3_y);
-  zerar_matriz(posicao_final_peca3_x);
-  zerar_matriz(posicao_final_peca3_y);
-
   desenha_principal(m, LARGURA_TELA*0.1, ALTURA_TELA*0.05, LARGURA_TELA*0.8/10);
   desenha_pecas(p1, p2, p3);
 
   if (tela_rato_clicado()) {
-    tela_circulo(tela_rato_x(), tela_rato_y(), 5, 2, amarelo, transparente);
     peca_clicada = retorna_numero_peca(tela_rato_x(),tela_rato_y());
   }
 
@@ -194,25 +191,21 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
     if (peca_clicada == 1){
       desenha_peca(p1, x_clicado-10, y_clicado-10, LARGURA_TELA*0.8/10,posicao_inicial_peca1_x,posicao_inicial_peca1_y,
         posicao_final_peca1_x,posicao_final_peca1_y);
-      tela_circulo(tela_rato_x(), tela_rato_y(), 4, 1, amarelo, transparente);
     } else if (peca_clicada == 2){
       desenha_peca(p2, x_clicado-55, y_clicado-55, LARGURA_TELA*0.8/10,posicao_inicial_peca2_x,posicao_inicial_peca2_y,
         posicao_final_peca2_x,posicao_final_peca2_y);
-      tela_circulo(tela_rato_x(), tela_rato_y(), 4, 1, amarelo, transparente);
     } else if (peca_clicada == 3){
       desenha_peca(p3, x_clicado-100, y_clicado-100, LARGURA_TELA*0.8/10,posicao_inicial_peca3_x,posicao_inicial_peca3_y,
         posicao_final_peca3_x,posicao_final_peca3_y);
-      tela_circulo(tela_rato_x(), tela_rato_y(), 4, 1, amarelo, transparente);
     }
+    tela_circulo(x_clicado,y_clicado, 4, 1, amarelo, transparente);
     if (linha_matriz_clicada != -1 && coluna_matriz_clicada != -1){
-        retorna_posicao_principal(tela_rato_x(),tela_rato_y(), posicao_inicial_quadrado_x, posicao_inicial_quadrado_y,
-        posicao_final_quadrado_x, posicao_final_quadrado_y,&linha_matriz,&coluna_matriz);
         selecionou_peca = true;
-      }
+    }
   }else{
     tela_circulo(tela_rato_x(), tela_rato_y(), 3, 1, marrom, transparente);
     if (selecionou_peca){
-      if(verifica_jogada(peca_clicada, linha_matriz, coluna_matriz, m)){
+      if(verifica_jogada(peca_clicada, linha_matriz_clicada, coluna_matriz_clicada, m)){
         
       }
     }
@@ -286,32 +279,37 @@ void desenha_pecas(int p1[5][5], int p2[5][5], int p3[5][5])
 }
 
 bool verifica_jogada(int peca, int linha, int coluna, int m[10][10]){
-  if (peca == 1){
-    if (m[coluna][linha] == 0 && m[coluna][linha+1] == 0 && m[coluna][linha+2] == 0){
-      m[coluna][linha] = 1;
-      m[coluna][linha+1] = 1;
-      m[coluna][linha+2] = 1;
-      return true;
-    }else{
-      return false;
-    }
-  }else if (peca == 2){
-    if (m[coluna][linha] == 0 && m[coluna+1][linha] == 0 && m[coluna+2][linha] == 0 && m[coluna+2][linha+1] == 0 && m[coluna+2][linha+2] == 0){
-      m[coluna][linha] = 1;
-      m[coluna+1][linha] = 1;
-      m[coluna+2][linha] = 1;
-      m[coluna+2][linha+1] = 1;
-      m[coluna+2][linha+2] = 1;
-      return true;
-    }else{
-      return false;
-    }
-  }else if(peca == 3){
-    if (m[coluna][linha] == 0){
-      m[coluna][linha] = 1;
-      return true;
-    }else{
-      return false;
-    }
+  switch(peca) {
+    case 1:
+      if (m[coluna][linha] == 0 && m[coluna][linha+1] == 0 && m[coluna][linha+2] == 0){
+        m[coluna][linha] = 1;
+        m[coluna][linha+1] = 1;
+        m[coluna][linha+2] = 1;
+        return true;
+      }else{
+        return false;
+      }
+      break;
+    case 2:
+      if (m[coluna][linha] == 0 && m[coluna+1][linha] == 0 && m[coluna+2][linha] == 0 && m[coluna+2][linha+1] == 0 && m[coluna+2][linha+2] == 0){
+        m[coluna][linha] = 1;
+        m[coluna+1][linha] = 1;
+        m[coluna+2][linha] = 1;
+        m[coluna+2][linha+1] = 1;
+        m[coluna+2][linha+2] = 1;
+        return true;
+      }else{
+        return false;
+      }
+      break;
+    case 3:
+      if (m[coluna][linha] == 0){
+        m[coluna][linha] = 1;
+        return true;
+      }else{
+        return false;
+      }
+      break;
   }
+  return false;
 }
