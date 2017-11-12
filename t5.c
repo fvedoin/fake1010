@@ -48,6 +48,7 @@ bool clicou_em_alguma_peca = false;
 
 // função auxiliar usada por main, definida abaixo
 void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5]);
+bool verifica_jogada(int peca, int linha, int coluna, int m[10][10]);
 
 // A função principal
 int main(void)
@@ -211,8 +212,9 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
   }else{
     tela_circulo(tela_rato_x(), tela_rato_y(), 3, 1, marrom, transparente);
     if (selecionou_peca){
-      // verifica_jogada(peca_clicada, linha_matriz, coluna_matriz);
-      m[coluna_matriz][linha_matriz] = 1;
+      if(verifica_jogada(peca_clicada, linha_matriz, coluna_matriz, m)){
+        
+      }
     }
   }
   
@@ -281,4 +283,35 @@ void desenha_pecas(int p1[5][5], int p2[5][5], int p3[5][5])
                posicao_final_peca2_x,posicao_final_peca2_y);
   desenha_peca(p3, 0.7*LARGURA_TELA, 0.8*ALTURA_TELA, 0.2*LARGURA_TELA/5,posicao_inicial_peca3_x,posicao_inicial_peca3_y,
                posicao_final_peca3_x,posicao_final_peca3_y);
+}
+
+bool verifica_jogada(int peca, int linha, int coluna, int m[10][10]){
+  if (peca == 1){
+    if (m[coluna][linha] == 0 && m[coluna][linha+1] == 0 && m[coluna][linha+2] == 0){
+      m[coluna][linha] = 1;
+      m[coluna][linha+1] = 1;
+      m[coluna][linha+2] = 1;
+      return true;
+    }else{
+      return false;
+    }
+  }else if (peca == 2){
+    if (m[coluna][linha] == 0 && m[coluna+1][linha] == 0 && m[coluna+2][linha] == 0 && m[coluna+2][linha+1] == 0 && m[coluna+2][linha+2] == 0){
+      m[coluna][linha] = 1;
+      m[coluna+1][linha] = 1;
+      m[coluna+2][linha] = 1;
+      m[coluna+2][linha+1] = 1;
+      m[coluna+2][linha+2] = 1;
+      return true;
+    }else{
+      return false;
+    }
+  }else if(peca == 3){
+    if (m[coluna][linha] == 0){
+      m[coluna][linha] = 1;
+      return true;
+    }else{
+      return false;
+    }
+  }
 }
