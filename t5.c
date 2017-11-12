@@ -16,6 +16,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+int indice_peca = 0;
+bool selecionou_peca = false;
 const int LARGURA_TELA = 560;
 const int ALTURA_TELA = 640;
 
@@ -37,10 +39,10 @@ float x_clicado;
 float y_clicado;
 char texto[100];
 char texto2[100];
-int linha_matriz;
-int coluna_matriz;
-int linha_matriz_clicada;
-int coluna_matriz_clicada;
+int linha_matriz = -1;
+int coluna_matriz = -1;
+int linha_matriz_clicada = 0;
+int coluna_matriz_clicada = 0;
 int peca_clicada = 0;
 bool clicou_em_alguma_peca = false;
 
@@ -179,28 +181,36 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
   desenha_pecas(p1, p2, p3);
   tela_retangulo(LARGURA_TELA*0.2, ALTURA_TELA*0.8,LARGURA_TELA*0.3, ALTURA_TELA*0.9,2,amarelo,azul);
 
-
-  if (tela_rato_apertado()) {
+  if (tela_rato_clicado()) {
     tela_circulo(tela_rato_x(), tela_rato_y(), 5, 2, amarelo, transparente);
     peca_clicada = retorna_numero_peca(tela_rato_x(),tela_rato_y());
     sprintf(texto,"A peca clicada foi a numero: %f ------- %f ---- %d -",tela_rato_x(),tela_rato_y(),peca_clicada);
     tela_texto(tela_rato_x(),tela_rato_y(),10,amarelo,texto);
-  } else {
-    retorna_posicao_principal(tela_rato_x(),tela_rato_y(), posicao_inicial_quadrado_x, posicao_inicial_quadrado_y,
-    posicao_final_quadrado_x, posicao_final_quadrado_y,&linha_matriz,&coluna_matriz);
-    if ((peca_clicada==1 || peca_clicada==2 || peca_clicada==3) && linha_matriz!=-1 && coluna_matriz!=-1) {
-      tela_circulo(tela_rato_x(), tela_rato_y(), 3, 1, marrom, transparente);
-    }
   }
 
-  if (tela_rato_clicado() && (peca_clicada==1 || peca_clicada==2 || peca_clicada==3)) {
+  if (tela_rato_apertado() && (peca_clicada==1 || peca_clicada==2 || peca_clicada==3)) {
     x_clicado = tela_rato_x();
     y_clicado = tela_rato_y();
     retorna_posicao_principal(x_clicado,y_clicado, posicao_inicial_quadrado_x, posicao_inicial_quadrado_y,
     posicao_final_quadrado_x, posicao_final_quadrado_y,&linha_matriz_clicada,&coluna_matriz_clicada);
-    tela_circulo(tela_rato_x()+30, tela_rato_y()+30, 9, 1, azul, transparente);
+    // tela_circulo(tela_rato_x()+30, tela_rato_y()+30, 9, 1, azul, transparente);
+    if (peca_clicada == 1){
+      desenha_peca(p1, x_clicado-10, y_clicado-10, LARGURA_TELA*0.8/10,posicao_inicial_peca1_x,posicao_inicial_peca1_y,
+        posicao_final_peca1_x,posicao_final_peca1_y);
+      tela_circulo(tela_rato_x(), tela_rato_y(), 3, 1, marrom, transparente);
+      
+    }
+    if (linha_matriz_clicada != -1 && coluna_matriz_clicada != -1){
+        retorna_posicao_principal(tela_rato_x(),tela_rato_y(), posicao_inicial_quadrado_x, posicao_inicial_quadrado_y,
+        posicao_final_quadrado_x, posicao_final_quadrado_y,&linha_matriz,&coluna_matriz);
+        selecionou_peca = true;
+      }
+  }else{
+    if (selecionou_peca){
+      m[coluna_matriz][linha_matriz] = 1;
+    }
   }
-
+  
   tela_termina_desenho();
 }
 
