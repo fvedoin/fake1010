@@ -179,13 +179,10 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
 
   desenha_principal(m, LARGURA_TELA*0.1, ALTURA_TELA*0.05, LARGURA_TELA*0.8/10);
   desenha_pecas(p1, p2, p3);
-  tela_retangulo(LARGURA_TELA*0.2, ALTURA_TELA*0.8,LARGURA_TELA*0.3, ALTURA_TELA*0.9,2,amarelo,azul);
 
   if (tela_rato_clicado()) {
     tela_circulo(tela_rato_x(), tela_rato_y(), 5, 2, amarelo, transparente);
     peca_clicada = retorna_numero_peca(tela_rato_x(),tela_rato_y());
-    sprintf(texto,"A peca clicada foi a numero: %f ------- %f ---- %d -",tela_rato_x(),tela_rato_y(),peca_clicada);
-    tela_texto(tela_rato_x(),tela_rato_y(),10,amarelo,texto);
   }
 
   if (tela_rato_apertado() && (peca_clicada==1 || peca_clicada==2 || peca_clicada==3)) {
@@ -193,12 +190,18 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
     y_clicado = tela_rato_y();
     retorna_posicao_principal(x_clicado,y_clicado, posicao_inicial_quadrado_x, posicao_inicial_quadrado_y,
     posicao_final_quadrado_x, posicao_final_quadrado_y,&linha_matriz_clicada,&coluna_matriz_clicada);
-    // tela_circulo(tela_rato_x()+30, tela_rato_y()+30, 9, 1, azul, transparente);
     if (peca_clicada == 1){
       desenha_peca(p1, x_clicado-10, y_clicado-10, LARGURA_TELA*0.8/10,posicao_inicial_peca1_x,posicao_inicial_peca1_y,
         posicao_final_peca1_x,posicao_final_peca1_y);
-      tela_circulo(tela_rato_x(), tela_rato_y(), 3, 1, marrom, transparente);
-      
+      tela_circulo(tela_rato_x(), tela_rato_y(), 4, 1, amarelo, transparente);
+    } else if (peca_clicada == 2){
+      desenha_peca(p2, x_clicado-55, y_clicado-55, LARGURA_TELA*0.8/10,posicao_inicial_peca2_x,posicao_inicial_peca2_y,
+        posicao_final_peca2_x,posicao_final_peca2_y);
+      tela_circulo(tela_rato_x(), tela_rato_y(), 4, 1, amarelo, transparente);
+    } else if (peca_clicada == 3){
+      desenha_peca(p3, x_clicado-100, y_clicado-100, LARGURA_TELA*0.8/10,posicao_inicial_peca3_x,posicao_inicial_peca3_y,
+        posicao_final_peca3_x,posicao_final_peca3_y);
+      tela_circulo(tela_rato_x(), tela_rato_y(), 4, 1, amarelo, transparente);
     }
     if (linha_matriz_clicada != -1 && coluna_matriz_clicada != -1){
         retorna_posicao_principal(tela_rato_x(),tela_rato_y(), posicao_inicial_quadrado_x, posicao_inicial_quadrado_y,
@@ -206,7 +209,9 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
         selecionou_peca = true;
       }
   }else{
+    tela_circulo(tela_rato_x(), tela_rato_y(), 3, 1, marrom, transparente);
     if (selecionou_peca){
+      // verifica_jogada(peca_clicada, linha_matriz, coluna_matriz);
       m[coluna_matriz][linha_matriz] = 1;
     }
   }
