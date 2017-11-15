@@ -12,6 +12,7 @@
 #include "tela.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
@@ -19,6 +20,8 @@
 
 const int LARGURA_TELA = 560;
 const int ALTURA_TELA = 640;
+
+FILE *maior_pontuacao;
 
 float posicao_inicial_quadrado_x[10][10],posicao_inicial_quadrado_y[10][10];
 float posicao_final_quadrado_x[10][10],posicao_final_quadrado_y[10][10];
@@ -30,21 +33,27 @@ float posicao_inicial_peca3_x[5][5],posicao_inicial_peca3_y[5][5];
 float posicao_final_peca3_x[5][5],posicao_final_peca3_y[5][5];
 float posicao_encerrar_jogo_x[2]={0.0,0.0},posicao_encerrar_jogo_y[2]={0.0,0.0};
 float posicao_pontuacao_jogo_x[2]={0.0,0.0},posicao_pontuacao_jogo_y[2]={0.0,0.0};
+float posicao_recorde_jogo_x[2]={0.0,0.0},posicao_recorde_jogo_y[2]={0.0,0.0};
 float x_clicado;
 float y_clicado;
 
 char texto[100];
 char texto_pontuacao[1000000];
+char texto_recorde[1000000];
+char texto_sem_movimentos[100];
+char linha[100];
 
 int linha_matriz_clicada = -1;
 int coluna_matriz_clicada = -1;
 int peca_clicada = 0;
 int indice_peca = 0;
 int soma_pontos = 0;
+int maior_pontuacao_atual = 0;
 
 bool clicou_em_alguma_peca = false;
 bool encerrar_jogo = false;
 bool selecionou_peca = false;
+bool sem_movimentos = false;
 bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int linha_m,
                                                  int coluna_m,int primeiro_quadrado_peca_linha,
                                                  int primeiro_quadrado_peca_coluna,
@@ -336,9 +345,17 @@ int main(void)
       m[i][j] = 0;
     }
   }
-  m[5][5] = 1;
-  m[5][6] = 1;
-  m[5][7] = 1;
+
+  maior_pontuacao = fopen("maior_pontuacao.txt","r");
+
+  if(maior_pontuacao != NULL){
+    while(fgets(linha, 100, maior_pontuacao) != NULL){
+      maior_pontuacao_atual = atoi(linha);
+      break;
+    }
+  }
+
+  fclose(maior_pontuacao);
 
   for (i=0; i<5; i++) {
     for (j=0; j<5; j++) {
@@ -431,6 +448,22 @@ int retorna_numero_peca(float x, float y)
   return 0;
 }
 
+void zerar_todas_matrizes_pecas()
+{
+  zerar_matriz(posicao_inicial_peca1_x);
+  zerar_matriz(posicao_inicial_peca1_y);
+  zerar_matriz(posicao_final_peca1_x);
+  zerar_matriz(posicao_final_peca1_y);
+  zerar_matriz(posicao_inicial_peca2_x);
+  zerar_matriz(posicao_inicial_peca2_y);
+  zerar_matriz(posicao_final_peca2_x);
+  zerar_matriz(posicao_final_peca2_y);
+  zerar_matriz(posicao_inicial_peca3_x);
+  zerar_matriz(posicao_inicial_peca3_y);
+  zerar_matriz(posicao_final_peca3_x);
+  zerar_matriz(posicao_final_peca3_y);
+}
+
 int indice_todas_pecas(int p[5][5])
 {
   int i,j;
@@ -442,6 +475,16 @@ int indice_todas_pecas(int p[5][5])
     }
   }
   return 0;
+}
+
+void atualizar_recorde(int pontuacao)
+{
+  if (pontuacao>maior_pontuacao_atual) {
+    maior_pontuacao_atual = pontuacao;
+    maior_pontuacao = fopen ("maior_pontuacao.txt", "w");
+    fprintf(maior_pontuacao, "%d",maior_pontuacao_atual);
+    fclose(maior_pontuacao);
+  }
 }
 
 int retorna_subtracao_x_rato(int p[5][5])
@@ -497,6 +540,22 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
   sprintf(texto_pontuacao,"Pontuacao: %d", soma_pontos);
   tela_texto_dir(posicao_pontuacao_jogo_x[0]+2,posicao_pontuacao_jogo_y[0]+2,12,preto,texto_pontuacao);
 
+
+  posicao_recorde_jogo_x[0] = 1;
+  posicao_recorde_jogo_x[1] = 200;
+  posicao_recorde_jogo_y[0] = ALTURA_TELA*0.05;
+  posicao_recorde_jogo_y[1] = ALTURA_TELA*0.085;
+  tela_retangulo(posicao_recorde_jogo_x[0],posicao_recorde_jogo_y[0],posicao_recorde_jogo_x[1]
+                 ,posicao_recorde_jogo_y[1],2,branco,verde);
+  sprintf(texto_recorde,"Recorde atual: %d", maior_pontuacao_atual);
+  tela_texto_dir(posicao_recorde_jogo_x[0]+2,posicao_recorde_jogo_y[0]+2,12,preto,texto_recorde);
+
+  if (sem_movimentos) {
+    zerar_todas_matrizes_pecas();
+    sprintf(texto_sem_movimentos,"Sem movimentos possiveis!");
+    tela_texto_dir(LARGURA_TELA*0.13,ALTURA_TELA*0.4,30,vermelho,texto_sem_movimentos);
+  }
+
   if (tela_rato_clicado()) {
     peca_clicada = retorna_numero_peca(tela_rato_x(),tela_rato_y());
     encerrar_jogo = retorna_encerramento_jogo(tela_rato_x(),tela_rato_y());
@@ -529,19 +588,26 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
     if (selecionou_peca && linha_matriz_clicada != -1 && coluna_matriz_clicada != -1){
       if(verifica_jogada(peca_clicada, linha_matriz_clicada, coluna_matriz_clicada, m,p1,p2,p3)){
         soma_pontos = soma_pontos + quantidade_quadrados(peca_clicada, p1, p2, p3);
+        int cont = 0;
         zerar_peca(peca_clicada, p1, p2, p3);
         for (int i = 0; i < 10; i++){
           for (int j = 0; j < 10; j++){
             if(pontol(j, m)){
+              cont++;
               soma_pontos = soma_pontos + 10;
               limpa_linha(j, m);
             }
             if(pontoc(i, m)){
+              cont++;
               soma_pontos = soma_pontos + 10;
               limpa_coluna(i, m);
             }
           }
         }
+        if (cont>1) {
+          soma_pontos = soma_pontos + (10*(cont-1));
+        }
+        atualizar_recorde(soma_pontos);
         bool mov_possivel1 = false, mov_possivel2 = false, mov_possivel3 = false;
         int primeiro_quadrado_peca_linha, primeiro_quadrado_peca_coluna;
         int qp1 = quantidade_quadrados(1, p1, p2, p3), qp2 = quantidade_quadrados(2, p1, p2, p3), qp3 = quantidade_quadrados(3, p1, p2, p3);
@@ -570,18 +636,8 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
               }
             }
           }
-          if(mov_possivel1 || mov_possivel2 || mov_possivel3){
-            encerrar_jogo = false;
-          }else{
-            posicao_encerrar_jogo_x[0] = 0;
-            posicao_encerrar_jogo_x[1] = LARGURA_TELA;
-            posicao_encerrar_jogo_y[0] = 0;
-            posicao_encerrar_jogo_y[1] = ALTURA_TELA;
-            tela_retangulo(posicao_encerrar_jogo_x[0],posicao_encerrar_jogo_y[0],posicao_encerrar_jogo_x[1]
-                           ,posicao_encerrar_jogo_y[1],2,branco,vermelho);
-            sprintf(texto,"Encerrar jogo");
-            tela_texto_dir(posicao_encerrar_jogo_x[0]+2,posicao_encerrar_jogo_y[0]+2,30,preto,texto);
-            encerrar_jogo = true;
+          if(!(mov_possivel1 || mov_possivel2 || mov_possivel3)){
+            sem_movimentos = true;
           }
         }
         if (verifica_peca_zerada(p1) && verifica_peca_zerada(p2) && verifica_peca_zerada(p3)){
@@ -607,18 +663,8 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
               }
             }
           }
-          if(mov_possivel1 || mov_possivel2 || mov_possivel3){
-            encerrar_jogo = false;
-          }else{
-            posicao_encerrar_jogo_x[0] = 0;
-            posicao_encerrar_jogo_x[1] = LARGURA_TELA;
-            posicao_encerrar_jogo_y[0] = 0;
-            posicao_encerrar_jogo_y[1] = ALTURA_TELA;
-            tela_retangulo(posicao_encerrar_jogo_x[0],posicao_encerrar_jogo_y[0],posicao_encerrar_jogo_x[1]
-                           ,posicao_encerrar_jogo_y[1],2,branco,vermelho);
-            sprintf(texto,"Encerrar jogo");
-            tela_texto_dir(posicao_encerrar_jogo_x[0]+2,posicao_encerrar_jogo_y[0]+2,30,preto,texto);
-            encerrar_jogo = true;
+          if(!(mov_possivel1 || mov_possivel2 || mov_possivel3)){
+            sem_movimentos = true;
           }
         }
       }
