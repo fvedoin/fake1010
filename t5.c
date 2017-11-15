@@ -42,6 +42,7 @@ char texto_pontuacao[1000000];
 char texto_recorde[1000000];
 char texto_sem_movimentos[100];
 char linha[100];
+char texto_titulo[11];
 
 int linha_matriz_clicada = -1;
 int coluna_matriz_clicada = -1;
@@ -49,6 +50,9 @@ int peca_clicada = 0;
 int indice_peca = 0;
 int soma_pontos = 0;
 int maior_pontuacao_atual = 0;
+int c1 = 0;
+int c2 = 0;
+int c3 = 0;
 
 bool clicou_em_alguma_peca = false;
 bool encerrar_jogo = false;
@@ -330,7 +334,7 @@ void peca_aleatoria(int p[5][5]) {
 int main(void)
 {
   // inicializa a tela gráfica
-  tela_inicio(LARGURA_TELA, ALTURA_TELA, "Allegro5");
+  tela_inicio(LARGURA_TELA, ALTURA_TELA, "JOGO FAKE1010!");
 
   // o tabuleiro e as peças
   int m[10][10];
@@ -346,7 +350,7 @@ int main(void)
     }
   }
 
-  maior_pontuacao = fopen("maior_pontuacao.txt","r");
+  maior_pontuacao = fopen("maior_pontuacao.txt","ab+");
 
   if(maior_pontuacao != NULL){
     while(fgets(linha, 100, maior_pontuacao) != NULL){
@@ -366,6 +370,9 @@ int main(void)
   }
 
   srand(time(NULL));
+  c1 = (rand()%9)+1;
+  c2 = (rand()%9)+1;
+  c3 = (rand()%9)+1;
   peca_aleatoria(p1);
   peca_aleatoria(p2);
   peca_aleatoria(p3);
@@ -512,7 +519,7 @@ bool retorna_encerramento_jogo(float x,float y)
 // funções auxiliares usadas por desenha_tela, definidas abaixo
 void desenha_principal(int m[10][10], float x_ini, float y_ini, float lado);
 void desenha_peca(int p[5][5], float x_ini, float y_ini, float lado,float posicao_inicial_peca_x[5][5],float posicao_inicial_peca_y[5][5],
-                  float posicao_final_peca_x[5][5],float posicao_final_peca_y[5][5]);
+                  float posicao_final_peca_x[5][5],float posicao_final_peca_y[5][5], int cor);
 void desenha_pecas(int p1[5][5], int p2[5][5], int p3[5][5]);
 
 // função que desenha uma tela
@@ -522,14 +529,14 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
 
   desenha_principal(m, LARGURA_TELA*0.2, ALTURA_TELA*0.2, LARGURA_TELA*0.6/10);
   desenha_pecas(p1, p2, p3);
-  posicao_encerrar_jogo_x[0] = LARGURA_TELA*0.835;
+  posicao_encerrar_jogo_x[0] = LARGURA_TELA*0.95;
   posicao_encerrar_jogo_x[1] = LARGURA_TELA;
   posicao_encerrar_jogo_y[0] = ALTURA_TELA*0.005;
-  posicao_encerrar_jogo_y[1] = ALTURA_TELA*0.04;
+  posicao_encerrar_jogo_y[1] = ALTURA_TELA*0.06;
   tela_retangulo(posicao_encerrar_jogo_x[0],posicao_encerrar_jogo_y[0],posicao_encerrar_jogo_x[1]
                  ,posicao_encerrar_jogo_y[1],2,branco,vermelho);
-  sprintf(texto,"Encerrar jogo");
-  tela_texto_dir(posicao_encerrar_jogo_x[0]+2,posicao_encerrar_jogo_y[0]+2,12,preto,texto);
+  sprintf(texto,"X");
+  tela_texto_dir(posicao_encerrar_jogo_x[0]+2,posicao_encerrar_jogo_y[0]+2,30,branco,texto);
 
   posicao_pontuacao_jogo_x[0] = 1;
   posicao_pontuacao_jogo_x[1] = 200;
@@ -546,9 +553,12 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
   posicao_recorde_jogo_y[0] = ALTURA_TELA*0.05;
   posicao_recorde_jogo_y[1] = ALTURA_TELA*0.085;
   tela_retangulo(posicao_recorde_jogo_x[0],posicao_recorde_jogo_y[0],posicao_recorde_jogo_x[1]
-                 ,posicao_recorde_jogo_y[1],2,branco,verde);
+                 ,posicao_recorde_jogo_y[1],2,branco,amarelo);
   sprintf(texto_recorde,"Recorde atual: %d", maior_pontuacao_atual);
   tela_texto_dir(posicao_recorde_jogo_x[0]+2,posicao_recorde_jogo_y[0]+2,12,preto,texto_recorde);
+
+  sprintf(texto_titulo,"FAKE 1010!");
+  tela_texto_dir(LARGURA_TELA*0.3,ALTURA_TELA*0.1,40,branco,texto_titulo);
 
   if (sem_movimentos) {
     zerar_todas_matrizes_pecas();
@@ -569,15 +579,15 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
     if (peca_clicada == 1){
       int subtracao = retorna_subtracao_x_rato(p1);
       desenha_peca(p1, x_clicado-subtracao, y_clicado-10, LARGURA_TELA*0.6/10,posicao_inicial_peca1_x,posicao_inicial_peca1_y,
-        posicao_final_peca1_x,posicao_final_peca1_y);
+        posicao_final_peca1_x,posicao_final_peca1_y, c1);
     } else if (peca_clicada == 2){
       int subtracao = retorna_subtracao_x_rato(p2);
       desenha_peca(p2, x_clicado-subtracao, y_clicado-10, LARGURA_TELA*0.6/10,posicao_inicial_peca2_x,posicao_inicial_peca2_y,
-        posicao_final_peca2_x,posicao_final_peca2_y);
+        posicao_final_peca2_x,posicao_final_peca2_y, c2);
     } else if (peca_clicada == 3){
       int subtracao = retorna_subtracao_x_rato(p3);
       desenha_peca(p3, x_clicado-subtracao, y_clicado-10, LARGURA_TELA*0.6/10,posicao_inicial_peca3_x,posicao_inicial_peca3_y,
-        posicao_final_peca3_x,posicao_final_peca3_y);
+        posicao_final_peca3_x,posicao_final_peca3_y, c3);
     }
     tela_circulo(x_clicado,y_clicado, 4, 1, amarelo, transparente);
     if (linha_matriz_clicada != -1 && coluna_matriz_clicada != -1){
@@ -644,6 +654,9 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
           peca_aleatoria(p1);
           peca_aleatoria(p2);
           peca_aleatoria(p3);
+          c1 = (rand()%9)+1;
+          c2 = (rand()%9)+1;
+          c3 = (rand()%9)+1;
           desenha_pecas(p1, p2, p3);
           mov_possivel1 = false, mov_possivel2 = false, mov_possivel3 = false;
           int primeiro_quadrado_peca_linha, primeiro_quadrado_peca_coluna;
@@ -703,7 +716,7 @@ void desenha_principal(int m[10][10], float x_ini, float y_ini, float lado)
 // Desenha uma peça
 // a peça é definida em uma matriz 5x5, nas posições com valor != 0
 void desenha_peca(int p[5][5], float x_ini, float y_ini, float lado,float posicao_inicial_peca_x[5][5],float posicao_inicial_peca_y[5][5],
-                  float posicao_final_peca_x[5][5],float posicao_final_peca_y[5][5])
+                  float posicao_final_peca_x[5][5],float posicao_final_peca_y[5][5], int cor)
 {
   int i, j;
   zerar_matriz(posicao_inicial_peca_x);
@@ -722,7 +735,7 @@ void desenha_peca(int p[5][5], float x_ini, float y_ini, float lado,float posica
       posicao_final_peca_y[i][j] = y_ini + (j+1)*lado;
       tela_retangulo(posicao_inicial_peca_x[i][j], posicao_inicial_peca_y[i][j],
                      posicao_final_peca_x[i][j], posicao_final_peca_y[i][j],
-                     1, branco, azul);
+                     1, branco, cor);
     }
   }
 }  
@@ -732,11 +745,11 @@ void desenha_peca(int p[5][5], float x_ini, float y_ini, float lado,float posica
 void desenha_pecas(int p1[5][5], int p2[5][5], int p3[5][5])
 {
   desenha_peca(p1, 0.1*LARGURA_TELA, 0.8*ALTURA_TELA, 0.2*LARGURA_TELA/5,posicao_inicial_peca1_x,posicao_inicial_peca1_y,
-               posicao_final_peca1_x,posicao_final_peca1_y);
+               posicao_final_peca1_x,posicao_final_peca1_y, c1);
   desenha_peca(p2, 0.4*LARGURA_TELA, 0.8*ALTURA_TELA, 0.2*LARGURA_TELA/5,posicao_inicial_peca2_x,posicao_inicial_peca2_y,
-               posicao_final_peca2_x,posicao_final_peca2_y);
+               posicao_final_peca2_x,posicao_final_peca2_y, c2);
   desenha_peca(p3, 0.7*LARGURA_TELA, 0.8*ALTURA_TELA, 0.2*LARGURA_TELA/5,posicao_inicial_peca3_x,posicao_inicial_peca3_y,
-               posicao_final_peca3_x,posicao_final_peca3_y);
+               posicao_final_peca3_x,posicao_final_peca3_y, c3);
 }
 
 bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int linha_m,
