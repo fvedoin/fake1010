@@ -106,6 +106,41 @@ bool pontoc(int c, int m[10][10])
   }
 }
 
+int quantidade_quadrados(int peca_clicada, int p1[5][5], int p2[5][5], int p3[5][5])
+{
+  int num_quadrados = 0;
+  switch(peca_clicada){
+    case 1:
+      for (int i = 0; i < 5; i++){
+        for(int j = 0; j < 5; j++){
+          if (p1[i][j] == 1){
+            num_quadrados++;
+          }
+        }
+      }
+      break;
+    case 2:
+      for (int i = 0; i < 5; i++){
+        for(int j = 0; j < 5; j++){
+          if (p2[i][j] == 1){
+            num_quadrados++;
+          }
+        }
+      }
+      break;
+    case 3:
+      for (int i = 0; i < 5; i++){
+        for(int j = 0; j < 5; j++){
+          if (p3[i][j] == 1){
+            num_quadrados++;
+          }
+        }
+      }
+      break;
+  }
+  return num_quadrados;
+}
+
 void zerar_peca(int peca_clicada, int p1[5][5], int p2[5][5], int p3[5][5])
 {
   switch(peca_clicada){
@@ -491,6 +526,7 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
     tela_circulo(tela_rato_x(), tela_rato_y(), 3, 1, marrom, transparente);
     if (selecionou_peca && linha_matriz_clicada != -1 && coluna_matriz_clicada != -1){
       if(verifica_jogada(peca_clicada, linha_matriz_clicada, coluna_matriz_clicada, m,p1,p2,p3)){
+        soma_pontos = soma_pontos + quantidade_quadrados(peca_clicada, p1, p2, p3);
         zerar_peca(peca_clicada, p1, p2, p3);
         for (int i = 0; i < 10; i++){
           for (int j = 0; j < 10; j++){
