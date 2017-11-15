@@ -17,36 +17,38 @@
 #include <stdlib.h>
 #include <time.h>
 
-int indice_peca = 0;
-int soma_pontos = 0;
-bool selecionou_peca = false;
 const int LARGURA_TELA = 560;
 const int ALTURA_TELA = 640;
 
 float posicao_inicial_quadrado_x[10][10],posicao_inicial_quadrado_y[10][10];
 float posicao_final_quadrado_x[10][10],posicao_final_quadrado_y[10][10];
-
 float posicao_inicial_peca1_x[5][5],posicao_inicial_peca1_y[5][5];
 float posicao_final_peca1_x[5][5],posicao_final_peca1_y[5][5];
-
 float posicao_inicial_peca2_x[5][5],posicao_inicial_peca2_y[5][5];
 float posicao_final_peca2_x[5][5],posicao_final_peca2_y[5][5];
-
 float posicao_inicial_peca3_x[5][5],posicao_inicial_peca3_y[5][5];
 float posicao_final_peca3_x[5][5],posicao_final_peca3_y[5][5];
-
 float posicao_encerrar_jogo_x[2]={0.0,0.0},posicao_encerrar_jogo_y[2]={0.0,0.0};
 float posicao_pontuacao_jogo_x[2]={0.0,0.0},posicao_pontuacao_jogo_y[2]={0.0,0.0};
-
 float x_clicado;
 float y_clicado;
+
 char texto[100];
 char texto_pontuacao[1000000];
+
 int linha_matriz_clicada = -1;
 int coluna_matriz_clicada = -1;
 int peca_clicada = 0;
+int indice_peca = 0;
+int soma_pontos = 0;
+
 bool clicou_em_alguma_peca = false;
 bool encerrar_jogo = false;
+bool selecionou_peca = false;
+bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int linha_m,
+                                                 int coluna_m,int primeiro_quadrado_peca_linha,
+                                                 int primeiro_quadrado_peca_coluna,
+                                                 bool completar_tabuleiro_com_peca);
 
 // função auxiliar usada por main, definida abaixo
 void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5]);
@@ -540,16 +542,88 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
             }
           }
         }
+        bool mov_possivel1 = false, mov_possivel2 = false, mov_possivel3 = false;
+        int primeiro_quadrado_peca_linha, primeiro_quadrado_peca_coluna;
+        int qp1 = quantidade_quadrados(1, p1, p2, p3), qp2 = quantidade_quadrados(2, p1, p2, p3), qp3 = quantidade_quadrados(3, p1, p2, p3);
+        if (qp1 == 0 && qp2 == 0 && qp3 == 0){
+          encerrar_jogo = false;
+        }else{
+          for(int i = 0; i < 10; i++){
+            for(int j = 0; j < 10; j++){
+              if (qp1 > 0){
+                encontra_primeiro_quadrado_peca(p1,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
+                if(verifica_se_peca_cabe_no_tabuleiro_generica(p1,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false)){
+                  mov_possivel1 = true;
+                }
+              }
+              if (qp2 > 0){
+                encontra_primeiro_quadrado_peca(p2,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
+                if(verifica_se_peca_cabe_no_tabuleiro_generica(p2,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false)){
+                  mov_possivel2 = true;
+                }
+              }
+              if (qp3 > 0){
+                encontra_primeiro_quadrado_peca(p3,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
+                if(verifica_se_peca_cabe_no_tabuleiro_generica(p3,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false)){
+                  mov_possivel3 = true;
+                }
+              }
+            }
+          }
+          if(mov_possivel1 || mov_possivel2 || mov_possivel3){
+            encerrar_jogo = false;
+          }else{
+            posicao_encerrar_jogo_x[0] = 0;
+            posicao_encerrar_jogo_x[1] = LARGURA_TELA;
+            posicao_encerrar_jogo_y[0] = 0;
+            posicao_encerrar_jogo_y[1] = ALTURA_TELA;
+            tela_retangulo(posicao_encerrar_jogo_x[0],posicao_encerrar_jogo_y[0],posicao_encerrar_jogo_x[1]
+                           ,posicao_encerrar_jogo_y[1],2,branco,vermelho);
+            sprintf(texto,"Encerrar jogo");
+            tela_texto_dir(posicao_encerrar_jogo_x[0]+2,posicao_encerrar_jogo_y[0]+2,30,preto,texto);
+            encerrar_jogo = true;
+          }
+        }
         if (verifica_peca_zerada(p1) && verifica_peca_zerada(p2) && verifica_peca_zerada(p3)){
           peca_aleatoria(p1);
           peca_aleatoria(p2);
           peca_aleatoria(p3);
           desenha_pecas(p1, p2, p3);
+          mov_possivel1 = false, mov_possivel2 = false, mov_possivel3 = false;
+          int primeiro_quadrado_peca_linha, primeiro_quadrado_peca_coluna;
+          for(int i = 0; i < 10; i++){
+            for(int j = 0; j < 10; j++){
+              encontra_primeiro_quadrado_peca(p1,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
+              if(verifica_se_peca_cabe_no_tabuleiro_generica(p1,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false)){
+                mov_possivel1 = true;
+              }
+              encontra_primeiro_quadrado_peca(p2,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
+              if(verifica_se_peca_cabe_no_tabuleiro_generica(p2,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false)){
+                mov_possivel2 = true;
+              }
+              encontra_primeiro_quadrado_peca(p3,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
+              if(verifica_se_peca_cabe_no_tabuleiro_generica(p3,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false)){
+                mov_possivel3 = true;
+              }
+            }
+          }
+          if(mov_possivel1 || mov_possivel2 || mov_possivel3){
+            encerrar_jogo = false;
+          }else{
+            posicao_encerrar_jogo_x[0] = 0;
+            posicao_encerrar_jogo_x[1] = LARGURA_TELA;
+            posicao_encerrar_jogo_y[0] = 0;
+            posicao_encerrar_jogo_y[1] = ALTURA_TELA;
+            tela_retangulo(posicao_encerrar_jogo_x[0],posicao_encerrar_jogo_y[0],posicao_encerrar_jogo_x[1]
+                           ,posicao_encerrar_jogo_y[1],2,branco,vermelho);
+            sprintf(texto,"Encerrar jogo");
+            tela_texto_dir(posicao_encerrar_jogo_x[0]+2,posicao_encerrar_jogo_y[0]+2,30,preto,texto);
+            encerrar_jogo = true;
+          }
         }
       }
     }
   }
-  
   tela_termina_desenho();
 }
 
