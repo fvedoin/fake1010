@@ -34,6 +34,7 @@ float posicao_final_peca3_x[5][5],posicao_final_peca3_y[5][5];
 float posicao_encerrar_jogo_x[2]={0.0,0.0},posicao_encerrar_jogo_y[2]={0.0,0.0};
 float posicao_pontuacao_jogo_x[2]={0.0,0.0},posicao_pontuacao_jogo_y[2]={0.0,0.0};
 float posicao_recorde_jogo_x[2]={0.0,0.0},posicao_recorde_jogo_y[2]={0.0,0.0};
+float posicao_ajuda_jogo_x[2]={0.0,0.0},posicao_ajuda_jogo_y[2]={0.0,0.0};
 float x_clicado;
 float y_clicado;
 
@@ -41,6 +42,9 @@ char texto[100];
 char texto_pontuacao[1000000];
 char texto_recorde[1000000];
 char texto_sem_movimentos[100];
+char texto_ajuda[100];
+char texto_ajuda2[100];
+char texto_ajuda3[100];
 char linha[100];
 char texto_titulo[11];
 
@@ -96,6 +100,7 @@ void limpa_coluna(int c, int m[10][10])
     m[c][i] = 0;
   }
 }
+
 bool pontol(int l, int m[10][10])
 {
   int sl = 0;
@@ -330,6 +335,15 @@ void peca_aleatoria(int p[5][5]) {
   }
 }
 
+int retorna_cor_peca() 
+{
+  int cor = (rand()%9)+1;
+  while (cor == 8 || cor == 5) {
+    cor = (rand()%9)+1;
+  }
+  return cor;
+}
+
 // A função principal
 int main(void)
 {
@@ -370,9 +384,9 @@ int main(void)
   }
 
   srand(time(NULL));
-  c1 = (rand()%9)+1;
-  c2 = (rand()%9)+1;
-  c3 = (rand()%9)+1;
+  c1 = retorna_cor_peca();
+  c2 = retorna_cor_peca();
+  c3 = retorna_cor_peca();
   peca_aleatoria(p1);
   peca_aleatoria(p2);
   peca_aleatoria(p3);
@@ -557,6 +571,21 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
   sprintf(texto_recorde,"Recorde atual: %d", maior_pontuacao_atual);
   tela_texto_dir(posicao_recorde_jogo_x[0]+2,posicao_recorde_jogo_y[0]+2,12,preto,texto_recorde);
 
+  posicao_ajuda_jogo_x[0] = 205;
+  posicao_ajuda_jogo_x[1] = LARGURA_TELA*0.93;
+  posicao_ajuda_jogo_y[0] = ALTURA_TELA*0.005;
+  posicao_ajuda_jogo_y[1] = ALTURA_TELA*0.085;
+  tela_retangulo(posicao_ajuda_jogo_x[0],posicao_ajuda_jogo_y[0],posicao_ajuda_jogo_x[1]
+                 ,posicao_ajuda_jogo_y[1],2,branco,azul);
+  sprintf(texto_ajuda,"Selecione e arraste as pecas para preencher");
+  sprintf(texto_ajuda2,"linhas ou colunas do tabuleiro.");
+  sprintf(texto_ajuda3,"Faca a maior pontuacao possivel!");
+  tela_texto_dir(posicao_ajuda_jogo_x[0]+2,posicao_ajuda_jogo_y[0]+2,12,branco,texto_ajuda);
+  tela_texto_dir(posicao_ajuda_jogo_x[0]+2,posicao_ajuda_jogo_y[0]+16,12,branco,texto_ajuda2);
+  tela_texto_dir(posicao_ajuda_jogo_x[0]+2,posicao_ajuda_jogo_y[0]+30,12,branco,texto_ajuda3);
+
+
+
   sprintf(texto_titulo,"FAKE 1010!");
   tela_texto_dir(LARGURA_TELA*0.3,ALTURA_TELA*0.1,40,branco,texto_titulo);
 
@@ -654,9 +683,9 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
           peca_aleatoria(p1);
           peca_aleatoria(p2);
           peca_aleatoria(p3);
-          c1 = (rand()%9)+1;
-          c2 = (rand()%9)+1;
-          c3 = (rand()%9)+1;
+          c1 = retorna_cor_peca();
+          c2 = retorna_cor_peca();
+          c3 = retorna_cor_peca();
           desenha_pecas(p1, p2, p3);
           mov_possivel1 = false, mov_possivel2 = false, mov_possivel3 = false;
           int primeiro_quadrado_peca_linha, primeiro_quadrado_peca_coluna;
