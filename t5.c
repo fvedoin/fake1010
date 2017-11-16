@@ -1,14 +1,4 @@
-// Laboratório I de Programação
-//
-// Programa de exemplo para o trabalho 5
-//
-// Necessita os arquivos t5.c (este), tela.h, tela.c e DejaVuSans.ttf
-// Necessita ter instalado a biblioteca allegro5
-//
-// para compilar este programa, use este comando:
-// gcc -Wall -o t5 t5.c tela.c -lallegro_font -lallegro_color -lallegro_ttf -lallegro_primitives -lallegro
-//
-
+//Alunos: Felipe Cechin Mello e Fernando Vedoin Garcia. Jogo de tabuleiro que gera peças aleatórias a serem colocadas no mesmo com o objetivo de completar linhas e colunas para ganhar pontos. 
 #include "tela.h"
 
 #include <stdio.h>
