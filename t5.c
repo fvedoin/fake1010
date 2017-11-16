@@ -29,8 +29,8 @@ float x_clicado;
 float y_clicado;
 
 char texto[100];
-char texto_pontuacao[1000000];
-char texto_recorde[1000000];
+char texto_pontuacao[100];
+char texto_recorde[100];
 char texto_sem_movimentos[100];
 char texto_ajuda[100];
 char texto_ajuda2[100];
