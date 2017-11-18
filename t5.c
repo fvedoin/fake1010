@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <stdlib.h>
 #include <time.h>
 
 const int LARGURA_TELA = 560;
@@ -75,19 +74,6 @@ bool verifica_peca_zerada(int p[5][5])
     return true;
   }else{
     return false;
-  }
-}
-
-void limpa_linha(int l, int m[10][10])
-{
-  for (int i = 0; i < 10; i++){
-    m[i][l] = 0;
-  }
-}
-void limpa_coluna(int c, int m[10][10])
-{
-  for (int i = 0; i < 10; i++){
-    m[c][i] = 0;
   }
 }
 
@@ -191,11 +177,6 @@ void zerar_matriz(float matriz[5][5])
 void completa_com_um(int p[5][5],int i,int j) 
 {
   p[i][j] = 1;
-}
-
-void completa_com_um_tabuleiro(int m[10][10],int i,int j)
-{
-  m[i][j] = 1;
 }
 
 void peca_aleatoria(int p[5][5]) {
@@ -608,42 +589,44 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
       desenha_peca(p3, x_clicado-subtracao, y_clicado-10, LARGURA_TELA*0.6/10,posicao_inicial_peca3_x,posicao_inicial_peca3_y,
         posicao_final_peca3_x,posicao_final_peca3_y, c3);
     }
-    tela_circulo(x_clicado,y_clicado, 4, 1, amarelo, transparente);
+    tela_circulo(x_clicado,y_clicado, 4, 1, preto, transparente);
     if (linha_matriz_clicada != -1 && coluna_matriz_clicada != -1){
         selecionou_peca = true;
     }
   }else{
     tela_circulo(tela_rato_x(), tela_rato_y(), 3, 1, marrom, transparente);
-    if (selecionou_peca && linha_matriz_clicada != -1 && coluna_matriz_clicada != -1){
-      if(verifica_jogada(peca_clicada, linha_matriz_clicada, coluna_matriz_clicada, m,p1,p2,p3)){
+    if (selecionou_peca && linha_matriz_clicada != -1 && coluna_matriz_clicada != -1) {
+      if(verifica_jogada(peca_clicada, linha_matriz_clicada, coluna_matriz_clicada, m,p1,p2,p3)) {
         soma_pontos = soma_pontos + quantidade_quadrados(peca_clicada, p1, p2, p3);
         int cont = 0;
         int linhas_fechadas[10], colunas_fechadas[10];
-        for (int i = 0; i < 10; ++i){
+        for (int i = 0; i < 10; i++){
           linhas_fechadas[i] = 0;
           colunas_fechadas[i] = 0;
         }
         zerar_peca(peca_clicada, p1, p2, p3);
         for (int i = 0; i < 10; i++){
-          for (int j = 0; j < 10; j++){
-            if(pontol(j, m)){
-              cont++;
-              soma_pontos = soma_pontos + 10;
-              linhas_fechadas[j] = 1;
-            }
-            if(pontoc(i, m)){
-              cont++;
-              soma_pontos = soma_pontos + 10;
-              colunas_fechadas[i] = 1;
-            }
+          if(pontol(i, m)){
+            cont++;
+            soma_pontos = soma_pontos + 10;
+            linhas_fechadas[i] = 1;
+          }
+          if(pontoc(i, m)){
+            cont++;
+            soma_pontos = soma_pontos + 10;
+            colunas_fechadas[i] = 1;
           }
         }
-        for (int i = 0; i < 10; ++i){
+        for (int i = 0; i < 10; i++){
           if(linhas_fechadas[i] == 1){
-            limpa_linha(i, m);
+            for (int k = 0; k < 10; k++){
+              m[k][i] = 0;
+            }
           }
           if (colunas_fechadas[i] == 1){
-            limpa_coluna(i, m);
+            for (int k = 0; k < 10; k++){
+              m[i][k] = 0;
+            }
           }
         }
         if (cont>1) {
@@ -710,6 +693,18 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
           }
           if(!(mov_possivel1 || mov_possivel2 || mov_possivel3)){
             sem_movimentos = true;
+          }
+        }
+        for (int i = 0; i < 10; i++){
+          if(linhas_fechadas[i] == 1){
+            for (int k = 0; k < 10; k++){
+              m[k][i] = 0;
+            }
+          }
+          if (colunas_fechadas[i] == 1){
+            for (int k = 0; k < 10; k++){
+              m[i][k] = 0;
+            }
           }
         }
       }
@@ -804,6 +799,10 @@ bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int l
     }
   }
 
+  if (conta_quadrados_peca==0) {
+    return false;
+  }
+
   int indice_linha[conta_quadrados_peca],indice_coluna[conta_quadrados_peca];
   int posicao_linhas_preenchidas[conta_quadrados_peca];
   int posicao_colunas_preenchidas[conta_quadrados_peca];
@@ -846,7 +845,7 @@ bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int l
 
   if (completar_tabuleiro_com_peca) {
     for (i=0;i<conta_quadrados_peca;i++) {
-      completa_com_um_tabuleiro(m,indice_coluna[i],indice_linha[i]);
+      m[indice_coluna[i]][indice_linha[i]] = 1;
     }
   }
   return true;
