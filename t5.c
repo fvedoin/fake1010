@@ -555,8 +555,6 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
   tela_texto_dir(posicao_ajuda_jogo_x[0]+2,posicao_ajuda_jogo_y[0]+16,12,branco,texto_ajuda2);
   tela_texto_dir(posicao_ajuda_jogo_x[0]+2,posicao_ajuda_jogo_y[0]+30,12,branco,texto_ajuda3);
 
-
-
   sprintf(texto_titulo,"FAKE 1010!");
   tela_texto_dir(LARGURA_TELA*0.3,ALTURA_TELA*0.1,40,branco,texto_titulo);
 
@@ -617,6 +615,10 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
             colunas_fechadas[i] = 1;
           }
         }
+        if (cont>1) {
+          soma_pontos = soma_pontos + (10*(cont-1));
+        }
+        atualizar_recorde(soma_pontos);
         for (int i = 0; i < 10; i++){
           if(linhas_fechadas[i] == 1){
             for (int k = 0; k < 10; k++){
@@ -629,10 +631,6 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
             }
           }
         }
-        if (cont>1) {
-          soma_pontos = soma_pontos + (10*(cont-1));
-        }
-        atualizar_recorde(soma_pontos);
         bool mov_possivel1 = false, mov_possivel2 = false, mov_possivel3 = false;
         int primeiro_quadrado_peca_linha, primeiro_quadrado_peca_coluna;
         int qp1 = quantidade_quadrados(1, p1, p2, p3), qp2 = quantidade_quadrados(2, p1, p2, p3), qp3 = quantidade_quadrados(3, p1, p2, p3);
@@ -693,18 +691,6 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
           }
           if(!(mov_possivel1 || mov_possivel2 || mov_possivel3)){
             sem_movimentos = true;
-          }
-        }
-        for (int i = 0; i < 10; i++){
-          if(linhas_fechadas[i] == 1){
-            for (int k = 0; k < 10; k++){
-              m[k][i] = 0;
-            }
-          }
-          if (colunas_fechadas[i] == 1){
-            for (int k = 0; k < 10; k++){
-              m[i][k] = 0;
-            }
           }
         }
       }
