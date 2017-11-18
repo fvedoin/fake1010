@@ -618,19 +618,32 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
       if(verifica_jogada(peca_clicada, linha_matriz_clicada, coluna_matriz_clicada, m,p1,p2,p3)){
         soma_pontos = soma_pontos + quantidade_quadrados(peca_clicada, p1, p2, p3);
         int cont = 0;
+        int linhas_fechadas[10], colunas_fechadas[10];
+        for (int i = 0; i < 10; ++i){
+          linhas_fechadas[i] = 0;
+          colunas_fechadas[i] = 0;
+        }
         zerar_peca(peca_clicada, p1, p2, p3);
         for (int i = 0; i < 10; i++){
           for (int j = 0; j < 10; j++){
             if(pontol(j, m)){
               cont++;
               soma_pontos = soma_pontos + 10;
-              limpa_linha(j, m);
+              linhas_fechadas[j] = 1;
             }
             if(pontoc(i, m)){
               cont++;
               soma_pontos = soma_pontos + 10;
-              limpa_coluna(i, m);
+              colunas_fechadas[i] = 1;
             }
+          }
+        }
+        for (int i = 0; i < 10; ++i){
+          if(linhas_fechadas[i] == 1){
+            limpa_linha(i, m);
+          }
+          if (colunas_fechadas[i] == 1){
+            limpa_coluna(i, m);
           }
         }
         if (cont>1) {
