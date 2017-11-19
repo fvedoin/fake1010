@@ -327,7 +327,6 @@ int main(void)
   int p2[5][5];
   int p3[5][5];
 
-  // poe uns valores no tabuleiro e nas peças, para demo
   int i, j;
   for (i=0; i<10; i++) {
     for (j=0; j<10; j++) {
@@ -596,47 +595,12 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
     if (selecionou_peca && linha_matriz_clicada != -1 && coluna_matriz_clicada != -1) {
       if(verifica_jogada(peca_clicada, linha_matriz_clicada, coluna_matriz_clicada, m,p1,p2,p3)) {
         soma_pontos = soma_pontos + quantidade_quadrados(peca_clicada, p1, p2, p3);
-        int cont = 0;
-        int linhas_fechadas[10], colunas_fechadas[10];
-        for (int i = 0; i < 10; i++){
-          linhas_fechadas[i] = 0;
-          colunas_fechadas[i] = 0;
-        }
-        zerar_peca(peca_clicada, p1, p2, p3);
-        for (int i = 0; i < 10; i++){
-          if(pontol(i, m)){
-            cont++;
-            soma_pontos = soma_pontos + 10;
-            linhas_fechadas[i] = 1;
-          }
-          if(pontoc(i, m)){
-            cont++;
-            soma_pontos = soma_pontos + 10;
-            colunas_fechadas[i] = 1;
-          }
-        }
-        if (cont>1) {
-          soma_pontos = soma_pontos + (10*(cont-1));
-        }
         atualizar_recorde(soma_pontos);
-        for (int i = 0; i < 10; i++){
-          if(linhas_fechadas[i] == 1){
-            for (int k = 0; k < 10; k++){
-              m[k][i] = 0;
-            }
-          }
-          if (colunas_fechadas[i] == 1){
-            for (int k = 0; k < 10; k++){
-              m[i][k] = 0;
-            }
-          }
-        }
+        zerar_peca(peca_clicada,p1,p2,p3);
         bool mov_possivel1 = false, mov_possivel2 = false, mov_possivel3 = false;
         int primeiro_quadrado_peca_linha, primeiro_quadrado_peca_coluna;
         int qp1 = quantidade_quadrados(1, p1, p2, p3), qp2 = quantidade_quadrados(2, p1, p2, p3), qp3 = quantidade_quadrados(3, p1, p2, p3);
-        if (qp1 == 0 && qp2 == 0 && qp3 == 0){
-          encerrar_jogo = false;
-        }else{
+        if (!(qp1 == 0 && qp2 == 0 && qp3 == 0)) {
           for(int i = 0; i < 10; i++){
             for(int j = 0; j < 10; j++){
               if (qp1 > 0){
@@ -830,9 +794,70 @@ bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int l
   }
 
   if (completar_tabuleiro_com_peca) {
-    for (i=0;i<conta_quadrados_peca;i++) {
-      m[indice_coluna[i]][indice_linha[i]] = 1;
+    int copia_tabuleiro[10][10];
+    for (int i=0;i<10;i++) {
+      for (int j=0;j<10;j++) {
+        copia_tabuleiro[i][j] = m[i][j];
+      }
     }
+    for (i=0;i<conta_quadrados_peca;i++) {
+      copia_tabuleiro[indice_coluna[i]][indice_linha[i]] = 1;
+    }
+    int cont = 0;
+    int linhas_fechadas[10], colunas_fechadas[10];
+    for (int i = 0; i < 10; i++){
+      linhas_fechadas[i] = 0;
+      colunas_fechadas[i] = 0;
+    }
+    for (int i = 0; i < 10; i++){
+      if(pontol(i, copia_tabuleiro)){
+        cont++;
+        soma_pontos = soma_pontos + 10;
+        linhas_fechadas[i] = 1;
+      }
+      if(pontoc(i, copia_tabuleiro)){
+        cont++;
+        soma_pontos = soma_pontos + 10;
+        colunas_fechadas[i] = 1;
+      }
+    }
+    if (cont>1) {
+      soma_pontos = soma_pontos + (10*(cont-1));
+    }
+    for (int i = 0; i < 10; i++){
+      if(linhas_fechadas[i] == 1){
+        for (int k = 0; k < 10; k++){
+          m[k][i] = 0;
+        }
+      }
+      if (colunas_fechadas[i] == 1){
+        for (int k = 0; k < 10; k++){
+          m[i][k] = 0;
+        }
+      }
+    }
+    for (int i = 0; i < conta_quadrados_peca; i++){
+      for (int j=0;j<10;j++) {
+        if (linhas_fechadas[j] == 1) {
+          if (indice_linha[i] == j) {
+            indice_linha[i] = -1;
+          }
+        }
+        if (colunas_fechadas[j] == 1) {
+          if (indice_coluna[i] == j) {
+            indice_coluna[i] = -1;
+          }
+        }
+      }
+    }
+    printf("--------\n");
+    for (i=0;i<conta_quadrados_peca;i++) {
+      printf("%d--%d\n",indice_linha[i],indice_coluna[i]);
+      if (indice_coluna[i]!=-1 && indice_linha[i]!=-1) {
+        m[indice_coluna[i]][indice_linha[i]] = 1;
+      }
+    }
+    printf("\n--------\n");
   }
   return true;
 }
