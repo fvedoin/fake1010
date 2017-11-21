@@ -850,14 +850,11 @@ bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int l
         }
       }
     }
-    printf("--------\n");
     for (i=0;i<conta_quadrados_peca;i++) {
-      printf("%d--%d\n",indice_linha[i],indice_coluna[i]);
       if (indice_coluna[i]!=-1 && indice_linha[i]!=-1) {
         m[indice_coluna[i]][indice_linha[i]] = 1;
       }
     }
-    printf("\n--------\n");
   }
   return true;
 }
