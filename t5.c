@@ -53,8 +53,10 @@ bool selecionou_peca = false;
 bool sem_movimentos = false;
 bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int linha_m,
                                                  int coluna_m,int primeiro_quadrado_peca_linha,
-                                                 int primeiro_quadrado_peca_coluna,
-                                                 bool completar_tabuleiro_com_peca);
+                                                 int primeiro_quadrado_peca_coluna);
+bool verifica_se_peca_cabe_no_tabuleiro_generica_completa_tabuleiro(int p[5][5],int m[10][10],int linha_m,
+                                                 int coluna_m,int primeiro_quadrado_peca_linha,
+                                                 int primeiro_quadrado_peca_coluna);
 
 // função auxiliar usada por main, definida abaixo
 void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5]);
@@ -593,6 +595,7 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
   }else{
     tela_circulo(tela_rato_x(), tela_rato_y(), 3, 1, marrom, transparente);
     if (selecionou_peca && linha_matriz_clicada != -1 && coluna_matriz_clicada != -1) {
+      selecionou_peca = false;
       if(verifica_jogada(peca_clicada, linha_matriz_clicada, coluna_matriz_clicada, m,p1,p2,p3)) {
         soma_pontos = soma_pontos + quantidade_quadrados(peca_clicada, p1, p2, p3);
         atualizar_recorde(soma_pontos);
@@ -605,19 +608,19 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
             for(int j = 0; j < 10; j++){
               if (qp1 > 0){
                 encontra_primeiro_quadrado_peca(p1,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
-                if(verifica_se_peca_cabe_no_tabuleiro_generica(p1,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false)){
+                if(verifica_se_peca_cabe_no_tabuleiro_generica(p1,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna)){
                   mov_possivel1 = true;
                 }
               }
               if (qp2 > 0){
                 encontra_primeiro_quadrado_peca(p2,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
-                if(verifica_se_peca_cabe_no_tabuleiro_generica(p2,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false)){
+                if(verifica_se_peca_cabe_no_tabuleiro_generica(p2,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna)){
                   mov_possivel2 = true;
                 }
               }
               if (qp3 > 0){
                 encontra_primeiro_quadrado_peca(p3,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
-                if(verifica_se_peca_cabe_no_tabuleiro_generica(p3,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false)){
+                if(verifica_se_peca_cabe_no_tabuleiro_generica(p3,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna)){
                   mov_possivel3 = true;
                 }
               }
@@ -640,15 +643,15 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
           for(int i = 0; i < 10; i++){
             for(int j = 0; j < 10; j++){
               encontra_primeiro_quadrado_peca(p1,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
-              if(verifica_se_peca_cabe_no_tabuleiro_generica(p1,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false)){
+              if(verifica_se_peca_cabe_no_tabuleiro_generica(p1,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna)){
                 mov_possivel1 = true;
               }
               encontra_primeiro_quadrado_peca(p2,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
-              if(verifica_se_peca_cabe_no_tabuleiro_generica(p2,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false)){
+              if(verifica_se_peca_cabe_no_tabuleiro_generica(p2,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna)){
                 mov_possivel2 = true;
               }
               encontra_primeiro_quadrado_peca(p3,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
-              if(verifica_se_peca_cabe_no_tabuleiro_generica(p3,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false)){
+              if(verifica_se_peca_cabe_no_tabuleiro_generica(p3,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna)){
                 mov_possivel3 = true;
               }
             }
@@ -731,8 +734,7 @@ void desenha_pecas(int p1[5][5], int p2[5][5], int p3[5][5])
 
 bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int linha_m,
                                                  int coluna_m,int primeiro_quadrado_peca_linha,
-                                                 int primeiro_quadrado_peca_coluna,
-                                                 bool completar_tabuleiro_com_peca)
+                                                 int primeiro_quadrado_peca_coluna)
 {
   if (m[coluna_m][linha_m]!=0) {
     return false;
@@ -793,69 +795,143 @@ bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int l
     k++;
   }
 
-  if (completar_tabuleiro_com_peca) {
-    int copia_tabuleiro[10][10];
-    for (int i=0;i<10;i++) {
-      for (int j=0;j<10;j++) {
-        copia_tabuleiro[i][j] = m[i][j];
-      }
-    }
-    for (i=0;i<conta_quadrados_peca;i++) {
-      copia_tabuleiro[indice_coluna[i]][indice_linha[i]] = 1;
-    }
-    int cont = 0;
-    int linhas_fechadas[10], colunas_fechadas[10];
-    for (int i = 0; i < 10; i++){
-      linhas_fechadas[i] = 0;
-      colunas_fechadas[i] = 0;
-    }
-    for (int i = 0; i < 10; i++){
-      if(pontol(i, copia_tabuleiro)){
-        cont++;
-        soma_pontos = soma_pontos + 10;
-        linhas_fechadas[i] = 1;
-      }
-      if(pontoc(i, copia_tabuleiro)){
-        cont++;
-        soma_pontos = soma_pontos + 10;
-        colunas_fechadas[i] = 1;
-      }
-    }
-    if (cont>1) {
-      soma_pontos = soma_pontos + (10*(cont-1));
-    }
-    for (int i = 0; i < 10; i++){
-      if(linhas_fechadas[i] == 1){
-        for (int k = 0; k < 10; k++){
-          m[k][i] = 0;
-        }
-      }
-      if (colunas_fechadas[i] == 1){
-        for (int k = 0; k < 10; k++){
-          m[i][k] = 0;
-        }
-      }
-    }
-    for (int i = 0; i < conta_quadrados_peca; i++){
-      for (int j=0;j<10;j++) {
-        if (linhas_fechadas[j] == 1) {
-          if (indice_linha[i] == j) {
-            indice_linha[i] = -1;
-          }
-        }
-        if (colunas_fechadas[j] == 1) {
-          if (indice_coluna[i] == j) {
-            indice_coluna[i] = -1;
-          }
-        }
-      }
-    }
-    for (i=0;i<conta_quadrados_peca;i++) {
-      if (indice_coluna[i]!=-1 && indice_linha[i]!=-1) {
-        m[indice_coluna[i]][indice_linha[i]] = 1;
+  return true;
+}
+
+
+bool verifica_se_peca_cabe_no_tabuleiro_generica_completa_tabuleiro(int p[5][5],int m[10][10],int linha_m,
+                                                                    int coluna_m,int primeiro_quadrado_peca_linha,
+                                                                    int primeiro_quadrado_peca_coluna)
+{
+  if (m[coluna_m][linha_m]!=0) {
+    return false;
+  }
+
+  int i,j,conta_quadrados_peca = 0,k=0;
+  int variacao_coluna = 0,variacao_linha = 0;
+
+  for (i=0;i<5;i++) {
+    for (j=0;j<5;j++) {
+      if (p[i][j] == 1) {
+        conta_quadrados_peca++;
       }
     }
   }
+
+  if (conta_quadrados_peca==0) {
+    return false;
+  }
+
+  int indice_linha[conta_quadrados_peca],indice_coluna[conta_quadrados_peca];
+  int posicao_linhas_preenchidas[conta_quadrados_peca];
+  int posicao_colunas_preenchidas[conta_quadrados_peca];
+
+  for (i=0;i<5;i++) {
+    for (j=0;j<5;j++) {
+      if (p[i][j] == 1) {
+        posicao_linhas_preenchidas[k] = j;
+        posicao_colunas_preenchidas[k] = i;
+        k++;
+      }
+    }
+  }
+
+  k = 0;
+  while(k<conta_quadrados_peca) {
+    variacao_linha = posicao_linhas_preenchidas[k] - primeiro_quadrado_peca_linha;
+    variacao_coluna = posicao_colunas_preenchidas[k] - primeiro_quadrado_peca_coluna;
+    indice_linha[k] = 0;
+    indice_coluna[k] = 0;
+    if (variacao_linha!=0) {
+      indice_linha[k] = linha_m + variacao_linha;
+    } else if (variacao_linha==0) {
+      indice_linha[k] = linha_m;
+    }
+    if (variacao_coluna!=0) {
+      indice_coluna[k] = coluna_m + variacao_coluna;
+    } else if (variacao_coluna==0) {
+      indice_coluna[k] = coluna_m;
+    }
+    if (indice_coluna[k]>=0 && indice_coluna[k]<10 && indice_linha[k]>=0 && indice_linha[k]<10) {
+      if (m[indice_coluna[k]][indice_linha[k]]!=0) {
+        return false;
+      }
+    } else {
+      return false;
+    }
+    k++;
+  }
+  
+  int copia_tabuleiro[10][10];
+  for (int i=0;i<10;i++) {
+    for (int j=0;j<10;j++) {
+      copia_tabuleiro[i][j] = m[i][j];
+    }
+  }
+  for (i=0;i<conta_quadrados_peca;i++) {
+    copia_tabuleiro[indice_coluna[i]][indice_linha[i]] = 1;
+  }
+  int cont = 0;
+  int linhas_fechadas[10], colunas_fechadas[10];
+  for (int i = 0; i < 10; i++){
+    linhas_fechadas[i] = 0;
+    colunas_fechadas[i] = 0;
+  }
+  for (int i = 0; i < 10; i++){
+    if(pontol(i, copia_tabuleiro)){
+      cont++;
+      soma_pontos = soma_pontos + 10;
+      linhas_fechadas[i] = 1;
+    }
+    if(pontoc(i, copia_tabuleiro)){
+      cont++;
+      soma_pontos = soma_pontos + 10;
+      colunas_fechadas[i] = 1;
+    }
+  }
+  if (cont>1) {
+    soma_pontos = soma_pontos + (10*(cont-1));
+  }
+  for (int i = 0; i < 10; i++){
+    if(linhas_fechadas[i] == 1){
+      for (int k = 0; k < 10; k++){
+        m[k][i] = 0;
+      }
+    }
+    if (colunas_fechadas[i] == 1){
+      for (int k = 0; k < 10; k++){
+        m[i][k] = 0;
+      }
+    }
+  }
+  for (int i = 0; i < conta_quadrados_peca; i++){
+    for (int j=0;j<10;j++) {
+      if (linhas_fechadas[j] == 1) {
+        if (indice_linha[i] == j) {
+          indice_linha[i] = -1;
+        }
+      }
+      if (colunas_fechadas[j] == 1) {
+        if (indice_coluna[i] == j) {
+          indice_coluna[i] = -1;
+        }
+      }
+    }
+  }
+  printf("--Linhas e colunas preenchidas do tabuleiro com a peca--\n");
+  for (i=0;i<conta_quadrados_peca;i++) {
+    printf("%d--%d\n",indice_linha[i],indice_coluna[i]);
+    if (indice_coluna[i]!=-1 && indice_linha[i]!=-1) {
+      m[indice_coluna[i]][indice_linha[i]] = 1;
+    }
+  }
+  printf("-------------------------------------------------------\n");
+
+  printf("--Linhas e colunas fechadas com a peca--\n");
+  for (i=0;i<10;i++) {
+    printf("%d--%d\n",linhas_fechadas[i],colunas_fechadas[i]);
+  }
+  printf("-----------------------------------------\n");
   return true;
 }
 
@@ -863,19 +939,21 @@ bool verifica_jogada(int peca, int linha, int coluna, int m[10][10],int p1[5][5]
 {
   int primeiro_quadrado_peca_linha;
   int primeiro_quadrado_peca_coluna;
-  switch(peca) {
-    case 1:
-      encontra_primeiro_quadrado_peca(p1,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
-      return verifica_se_peca_cabe_no_tabuleiro_generica(p1,m,linha,coluna,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,true);
-      break;
-    case 2:
-      encontra_primeiro_quadrado_peca(p2,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
-      return verifica_se_peca_cabe_no_tabuleiro_generica(p2,m,linha,coluna,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,true);
-      break;
-    case 3:
-      encontra_primeiro_quadrado_peca(p3,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
-      return verifica_se_peca_cabe_no_tabuleiro_generica(p3,m,linha,coluna,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,true);
-      break;
+  if(peca == 1){
+    encontra_primeiro_quadrado_peca(p1,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
+    if (verifica_se_peca_cabe_no_tabuleiro_generica_completa_tabuleiro(p1,m,linha,coluna,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna)) {
+      return true;
+    }
+  }else if(peca == 2){
+    encontra_primeiro_quadrado_peca(p2,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
+    if (verifica_se_peca_cabe_no_tabuleiro_generica_completa_tabuleiro(p2,m,linha,coluna,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna)) {
+      return true;
+    }
+  }else if(peca == 3){
+    encontra_primeiro_quadrado_peca(p3,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
+    if (verifica_se_peca_cabe_no_tabuleiro_generica_completa_tabuleiro(p3,m,linha,coluna,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna)) {
+      return true;
+    }
   }
   return false;
 }
