@@ -1,6 +1,5 @@
 //Alunos: Felipe Cechin Mello e Fernando Vedoin Garcia. Jogo de tabuleiro que gera peças aleatórias a serem colocadas no mesmo com o objetivo de completar linhas e colunas para ganhar pontos. 
 #include "tela.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -51,6 +50,7 @@ bool clicou_em_alguma_peca = false;
 bool encerrar_jogo = false;
 bool selecionou_peca = false;
 bool sem_movimentos = false;
+
 bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int linha_m,
                                                  int coluna_m,int primeiro_quadrado_peca_linha,
                                                  int primeiro_quadrado_peca_coluna,
@@ -102,6 +102,7 @@ bool pontoc(int c, int m[10][10])
   }
 }
 
+//Retorna o numero de quadrados preenchidos de cada peca
 int quantidade_quadrados(int peca_clicada, int p1[5][5], int p2[5][5], int p3[5][5])
 {
   int num_quadrados = 0;
@@ -137,6 +138,7 @@ int quantidade_quadrados(int peca_clicada, int p1[5][5], int p2[5][5], int p3[5]
   return num_quadrados;
 }
 
+//Seta as posicoes de uma peca com valor 0
 void zerar_peca(int peca_clicada, int p1[5][5], int p2[5][5], int p3[5][5])
 {
   switch(peca_clicada){
@@ -174,6 +176,7 @@ void zerar_matriz(float matriz[5][5])
   }
 }
 
+//Completa a matriz da peca com 1 baseada na linha e coluna
 void completa_com_um(int p[5][5],int i,int j) 
 {
   p[i][j] = 1;
@@ -318,11 +321,12 @@ int main(void)
       m[i][j] = 0;
     }
   }
-
+  //Abre o arquivo para leitura e escrita do recorde.
   maior_pontuacao = fopen("maior_pontuacao.txt","ab+");
 
   if(maior_pontuacao != NULL){
     while(fgets(linha, 100, maior_pontuacao) != NULL){
+      //Funcao atoi transforma um char para um int.
       maior_pontuacao_atual = atoi(linha);
       break;
     }
@@ -380,6 +384,7 @@ void encontra_posicao_principal(float x, float y, float posicao_inicial_quadrado
   }
 }
 
+//Troca os valores das variaveis com ponteiro.
 void encontra_primeiro_quadrado_peca(int posicao_quadrado[5][5],int *linha,int *coluna)
 {
   int i,j;
@@ -440,6 +445,7 @@ void zerar_todas_matrizes_pecas()
   zerar_matriz(posicao_final_peca3_y);
 }
 
+//Retorna o número maior que 1 que identifica a peca
 int indice_todas_pecas(int p[5][5])
 {
   int i,j;
@@ -463,6 +469,7 @@ void atualizar_recorde(int pontuacao)
   }
 }
 
+//Subtrai o x do rato quando a peca for selecionada
 int retorna_subtracao_x_rato(int p[5][5])
 {
   int subtracao = 0;
@@ -476,6 +483,7 @@ int retorna_subtracao_x_rato(int p[5][5])
   return subtracao;
 }
 
+//Verifica se o usuario clicou no X da tela
 bool retorna_encerramento_jogo(float x,float y) 
 {
   if (x>posicao_encerrar_jogo_x[0] && x<posicao_encerrar_jogo_x[1]
@@ -498,6 +506,8 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
 
   desenha_principal(m, LARGURA_TELA*0.2, ALTURA_TELA*0.2, LARGURA_TELA*0.6/10);
   desenha_pecas(p1, p2, p3);
+
+  //Seta as coordenadas e constroi o botao de encerramento do jogo
   posicao_encerrar_jogo_x[0] = LARGURA_TELA*0.95;
   posicao_encerrar_jogo_x[1] = LARGURA_TELA;
   posicao_encerrar_jogo_y[0] = ALTURA_TELA*0.005;
@@ -507,6 +517,8 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
   sprintf(texto,"X");
   tela_texto_dir(posicao_encerrar_jogo_x[0]+2,posicao_encerrar_jogo_y[0]+2,30,branco,texto);
 
+
+  //Seta as coordenadas e constroi o painel da pontuacao do jogo
   posicao_pontuacao_jogo_x[0] = 1;
   posicao_pontuacao_jogo_x[1] = 200;
   posicao_pontuacao_jogo_y[0] = ALTURA_TELA*0.005;
@@ -516,7 +528,7 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
   sprintf(texto_pontuacao,"Pontuacao: %d", soma_pontos);
   tela_texto_dir(posicao_pontuacao_jogo_x[0]+2,posicao_pontuacao_jogo_y[0]+2,12,preto,texto_pontuacao);
 
-
+  //Seta as coordenadas e constroi o painel da maior pontuacao
   posicao_recorde_jogo_x[0] = 1;
   posicao_recorde_jogo_x[1] = 200;
   posicao_recorde_jogo_y[0] = ALTURA_TELA*0.05;
@@ -526,6 +538,7 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
   sprintf(texto_recorde,"Recorde atual: %d", maior_pontuacao_atual);
   tela_texto_dir(posicao_recorde_jogo_x[0]+2,posicao_recorde_jogo_y[0]+2,12,preto,texto_recorde);
 
+  //Seta as coordenadas e constroi o painel de ajuda
   posicao_ajuda_jogo_x[0] = 205;
   posicao_ajuda_jogo_x[1] = LARGURA_TELA*0.93;
   posicao_ajuda_jogo_y[0] = ALTURA_TELA*0.005;
@@ -542,6 +555,7 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
   sprintf(texto_titulo,"FAKE 1010!");
   tela_texto_dir(LARGURA_TELA*0.3,ALTURA_TELA*0.1,40,branco,texto_titulo);
 
+  //Verifica se nao ha movimentos possiveis com as novas pecas geradas aleatoriamente
   if (sem_movimentos) {
     zerar_todas_matrizes_pecas();
     sprintf(texto_sem_movimentos,"Sem movimentos possiveis!");
@@ -553,6 +567,8 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
     encerrar_jogo = retorna_encerramento_jogo(tela_rato_x(),tela_rato_y());
   }
 
+
+  //Se o usuario clicou em alguma peca, ele podera arrasta-la para o tabuleiro
   if (tela_rato_apertado() && (peca_clicada==1 || peca_clicada==2 || peca_clicada==3)) {
     x_clicado = tela_rato_x();
     y_clicado = tela_rato_y();
@@ -721,6 +737,7 @@ bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int l
                                                  int primeiro_quadrado_peca_coluna,
                                                  bool completar_tabuleiro)
 {
+  //Se a coluna e linha que o usuario quer colocar a peca estiver preenchida, retorna falso
   if (m[coluna_m][linha_m]!=0) {
     return false;
   }
@@ -744,6 +761,7 @@ bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int l
   int posicao_linhas_preenchidas[conta_quadrados_peca];
   int posicao_colunas_preenchidas[conta_quadrados_peca];
 
+  //Coloca nos vetores as linhas e colunas da peca que estao preenchidas com 1
   for (i=0;i<5;i++) {
     for (j=0;j<5;j++) {
       if (p[i][j] == 1) {
@@ -756,6 +774,8 @@ bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int l
 
   k = 0;
   while(k<conta_quadrados_peca) {
+    //Calcula a variacao da linha e da coluna baseada no primeiro quadrado preenchido da peca
+    // e coloca nos vetores
     variacao_linha = posicao_linhas_preenchidas[k] - primeiro_quadrado_peca_linha;
     variacao_coluna = posicao_colunas_preenchidas[k] - primeiro_quadrado_peca_coluna;
     indice_linha[k] = 0;
@@ -780,6 +800,7 @@ bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int l
     k++;
   }
 
+  //Se o parametro for true, preenche o tabuleiro com a peca
   if (completar_tabuleiro) {
     int copia_tabuleiro[10][10];
     for (int i=0;i<10;i++) {
