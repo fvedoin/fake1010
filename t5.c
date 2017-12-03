@@ -23,6 +23,7 @@ float posicao_encerrar_jogo_x[2]={0.0,0.0},posicao_encerrar_jogo_y[2]={0.0,0.0};
 float posicao_pontuacao_jogo_x[2]={0.0,0.0},posicao_pontuacao_jogo_y[2]={0.0,0.0};
 float posicao_recorde_jogo_x[2]={0.0,0.0},posicao_recorde_jogo_y[2]={0.0,0.0};
 float posicao_ajuda_jogo_x[2]={0.0,0.0},posicao_ajuda_jogo_y[2]={0.0,0.0};
+float posicao_sem_mov_jogo_x[2]={0.0,0.0},posicao_sem_mov_jogo_y[2]={0.0,0.0};
 float x_clicado;
 float y_clicado;
 
@@ -45,6 +46,7 @@ int maior_pontuacao_atual = 0;
 int c1 = 0;
 int c2 = 0;
 int c3 = 0;
+int cor_cada_quadrado_tabuleiro[10][10];
 
 bool clicou_em_alguma_peca = false;
 bool encerrar_jogo = false;
@@ -54,7 +56,7 @@ bool sem_movimentos = false;
 bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int linha_m,
                                                  int coluna_m,int primeiro_quadrado_peca_linha,
                                                  int primeiro_quadrado_peca_coluna,
-                                                 bool completar_tabuleiro);
+                                                 bool completar_tabuleiro, int cor_peca);
 
 // função auxiliar usada por main, definida abaixo
 void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5]);
@@ -319,6 +321,7 @@ int main(void)
   for (i=0; i<10; i++) {
     for (j=0; j<10; j++) {
       m[i][j] = 0;
+      cor_cada_quadrado_tabuleiro[i][j] = 0;
     }
   }
   //Abre o arquivo para leitura e escrita do recorde.
@@ -558,8 +561,14 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
   //Verifica se nao ha movimentos possiveis com as novas pecas geradas aleatoriamente
   if (sem_movimentos) {
     zerar_todas_matrizes_pecas();
+    posicao_sem_mov_jogo_x[0] = LARGURA_TELA*0.13;
+    posicao_sem_mov_jogo_x[1] = LARGURA_TELA*0.9;
+    posicao_sem_mov_jogo_y[0] = ALTURA_TELA*0.41;
+    posicao_sem_mov_jogo_y[1] = ALTURA_TELA*0.47;
+    tela_retangulo(posicao_sem_mov_jogo_x[0],posicao_sem_mov_jogo_y[0],posicao_sem_mov_jogo_x[1]
+                   ,posicao_sem_mov_jogo_y[1],2,branco,vermelho);
     sprintf(texto_sem_movimentos,"Sem movimentos possiveis!");
-    tela_texto_dir(LARGURA_TELA*0.13,ALTURA_TELA*0.4,30,vermelho,texto_sem_movimentos);
+    tela_texto_dir(posicao_sem_mov_jogo_x[0]+4,posicao_sem_mov_jogo_y[0]+2,30,branco,texto_sem_movimentos);
   }
 
   if (tela_rato_clicado()) {
@@ -606,19 +615,19 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
             for(int j = 0; j < 10; j++){
               if (qp1 > 0){
                 encontra_primeiro_quadrado_peca(p1,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
-                if(verifica_se_peca_cabe_no_tabuleiro_generica(p1,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false)){
+                if(verifica_se_peca_cabe_no_tabuleiro_generica(p1,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false,0)){
                   mov_possivel1 = true;
                 }
               }
               if (qp2 > 0){
                 encontra_primeiro_quadrado_peca(p2,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
-                if(verifica_se_peca_cabe_no_tabuleiro_generica(p2,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false)){
+                if(verifica_se_peca_cabe_no_tabuleiro_generica(p2,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false,0)){
                   mov_possivel2 = true;
                 }
               }
               if (qp3 > 0){
                 encontra_primeiro_quadrado_peca(p3,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
-                if(verifica_se_peca_cabe_no_tabuleiro_generica(p3,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false)){
+                if(verifica_se_peca_cabe_no_tabuleiro_generica(p3,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false,0)){
                   mov_possivel3 = true;
                 }
               }
@@ -641,15 +650,15 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
           for(int i = 0; i < 10; i++){
             for(int j = 0; j < 10; j++){
               encontra_primeiro_quadrado_peca(p1,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
-              if(verifica_se_peca_cabe_no_tabuleiro_generica(p1,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false)){
+              if(verifica_se_peca_cabe_no_tabuleiro_generica(p1,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false,0)){
                 mov_possivel1 = true;
               }
               encontra_primeiro_quadrado_peca(p2,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
-              if(verifica_se_peca_cabe_no_tabuleiro_generica(p2,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false)){
+              if(verifica_se_peca_cabe_no_tabuleiro_generica(p2,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false,0)){
                 mov_possivel2 = true;
               }
               encontra_primeiro_quadrado_peca(p3,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
-              if(verifica_se_peca_cabe_no_tabuleiro_generica(p3,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false)){
+              if(verifica_se_peca_cabe_no_tabuleiro_generica(p3,m,j,i,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,false,0)){
                 mov_possivel3 = true;
               }
             }
@@ -671,24 +680,16 @@ void desenha_tela(int m[10][10], int p1[5][5], int p2[5][5], int p3[5][5])
 // livres.
 void desenha_principal(int m[10][10], float x_ini, float y_ini, float lado)
 {
-  int cor;
   int i, j; 
   for (i=0; i < 10; i++) {
     for (j=0; j < 10; j++) {
-      // Se houver peça, colorir a célula da matriz
-      // No jogo real, as células podem cores variadas
-      if (m[i][j] == 0) {
-        cor = transparente;
-      } else {
-        cor = azul;
-      }
       posicao_inicial_quadrado_x[i][j] = x_ini + i*lado;
       posicao_inicial_quadrado_y[i][j] = y_ini + j*lado;
       posicao_final_quadrado_x[i][j] = x_ini + (i+1)*lado;
       posicao_final_quadrado_y[i][j] = y_ini + (j+1)*lado;
       tela_retangulo(posicao_inicial_quadrado_x[i][j], posicao_inicial_quadrado_y[i][j],
                      posicao_final_quadrado_x[i][j], posicao_final_quadrado_y[i][j],
-                     2, branco, cor);
+                     2, branco, cor_cada_quadrado_tabuleiro[i][j]);
     }
   }
 }
@@ -735,7 +736,7 @@ void desenha_pecas(int p1[5][5], int p2[5][5], int p3[5][5])
 bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int linha_m,
                                                  int coluna_m,int primeiro_quadrado_peca_linha,
                                                  int primeiro_quadrado_peca_coluna,
-                                                 bool completar_tabuleiro)
+                                                 bool completar_tabuleiro, int cor_peca)
 {
   //Se a coluna e linha que o usuario quer colocar a peca estiver preenchida, retorna falso
   if (m[coluna_m][linha_m]!=0) {
@@ -836,11 +837,13 @@ bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int l
       if(linhas_fechadas[i] == 1){
         for (int k = 0; k < 10; k++){
           m[k][i] = 0;
+          cor_cada_quadrado_tabuleiro[k][i] = 0;
         }
       }
       if (colunas_fechadas[i] == 1){
         for (int k = 0; k < 10; k++){
           m[i][k] = 0;
+          cor_cada_quadrado_tabuleiro[i][k] = 0;
         }
       }
     }
@@ -861,6 +864,7 @@ bool verifica_se_peca_cabe_no_tabuleiro_generica(int p[5][5],int m[10][10],int l
     for (i=0;i<conta_quadrados_peca;i++) {
       if (indice_coluna[i]!=-1 && indice_linha[i]!=-1) {
         m[indice_coluna[i]][indice_linha[i]] = 1;
+        cor_cada_quadrado_tabuleiro[indice_coluna[i]][indice_linha[i]] = cor_peca;
       }
     }
   }
@@ -873,17 +877,17 @@ bool verifica_jogada(int peca, int linha, int coluna, int m[10][10],int p1[5][5]
   int primeiro_quadrado_peca_coluna;
   if(peca == 1){
     encontra_primeiro_quadrado_peca(p1,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
-    if (verifica_se_peca_cabe_no_tabuleiro_generica(p1,m,linha,coluna,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,true)) {
+    if (verifica_se_peca_cabe_no_tabuleiro_generica(p1,m,linha,coluna,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,true,c1)) {
       return true;
     }
   }else if(peca == 2){
     encontra_primeiro_quadrado_peca(p2,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
-    if (verifica_se_peca_cabe_no_tabuleiro_generica(p2,m,linha,coluna,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,true)) {
+    if (verifica_se_peca_cabe_no_tabuleiro_generica(p2,m,linha,coluna,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,true,c2)) {
       return true;
     }
   }else if(peca == 3){
     encontra_primeiro_quadrado_peca(p3,&primeiro_quadrado_peca_linha,&primeiro_quadrado_peca_coluna);
-    if (verifica_se_peca_cabe_no_tabuleiro_generica(p3,m,linha,coluna,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,true)) {
+    if (verifica_se_peca_cabe_no_tabuleiro_generica(p3,m,linha,coluna,primeiro_quadrado_peca_linha,primeiro_quadrado_peca_coluna,true,c3)) {
       return true;
     }
   }
